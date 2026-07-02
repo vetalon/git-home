@@ -1,0 +1,143 @@
+﻿external_id;name;Epic;Feature;Story;Layer;Severity;tag;precondition;description;scenario
+TC-RPMI-001;Успешная смена способа оплаты на привязанную карту (BANKCARD);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Critical;e2e,change-pmi,bankcard,happy-path;"Заказ в WAIT_RETRY_PAY; retry_pay.available_function = change_pmi; дедлайн не истёк; тогл RETRY_PAY_CHANGE_PMI включён; на карте достаточно средств.";;"1. Открыть деталку заказа.
+   [expected] Деталка открыта, отображается сценарий смены способа оплаты.
+2. Нажать «Изменить».
+   [expected] Открыт bottom sheet выбора способа оплаты.
+3. Выбрать привязанную карту BANKCARD.
+   [expected] Способ выбран, кнопка «Готово» активна.
+4. Нажать «Готово».
+   [expected] Вызван POST /retry-pay-by-linked-pmi; холд/extrahold успешен; деталка обновляется (~10 сек); оплата проходит; заказ продолжает обработку."
+TC-RPMI-002;Успешная смена на привязанный SberPay (SBERPAY);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Critical;e2e,change-pmi,sberpay,happy-path;"Заказ в WAIT_RETRY_PAY с change_pmi; есть активная связка SberPay; дедлайн не истёк.";;"1. Открыть деталку → «Изменить».
+   [expected] Открыт bottom sheet.
+2. Выбрать SBERPAY → «Готово».
+   [expected] POST /retry-pay-by-linked-pmi; успешный холд; деталка обновлена; оплата проходит."
+TC-RPMI-003;Успешная смена на Orange Pay (ORANGE_PAY);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Critical;e2e,change-pmi,orange-pay,happy-path;"Есть связка Orange Pay; KAF доступен; change_pmi; дедлайн не истёк.";;"1. Выбрать Orange Pay → «Готово».
+   [expected] POST /retry-pay-by-linked-pmi + fingerprint из KAF; успешная оплата; деталка обновлена."
+TC-RPMI-004;Смена через добавление новой карты (ADD_CARD);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Critical;e2e,change-pmi,add-card,happy-path;"Нет подходящей привязанной карты с достаточным балансом; change_pmi.";;"1. Выбрать «Добавить карту» → «Готово».
+   [expected] POST /retry-pay-by-unlinked-card; открывается вебвью Сбербанка.
+2. Пройти привязку карты в вебвью и закрыть его.
+   [expected] Возврат на деталку с обновлением (~10 сек); связка создана; оплата успешна."
+TC-RPMI-005;Смена через добавление SberPay (ADD_SBERPAY);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Critical;e2e,change-pmi,add-sberpay,happy-path;"Диплинк SberPay доступен (iOS — хотя бы одна схема; Android — диплинк отвечает).";;"1. Выбрать ADD_SBERPAY → «Готово».
+   [expected] POST /retry-pay-by-unlinked-sberpay; открыто приложение Сбера.
+2. Вернуться по обратному диплинку.
+   [expected] Деталка обновлена (~10 сек); связка и оплата успешны."
+TC-RPMI-006;Недостаточно средств при смене — повторный change_pmi;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Critical;e2e,change-pmi,negative,retry;"Первая смена завершилась HOLD_FAILED / WITHDRAW_FAILED; available_function остаётся change_pmi.";;"1. Повторить смену способа оплаты на другой метод.
+   [expected] Доступен повторный выбор; attempt_count увеличен; UI показывает сценарий смены (не «Списать сейчас»)."
+TC-RPMI-007;Истечение дедлайна retry_pay_deadline — смена недоступна;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Critical;e2e,change-pmi,deadline,negative;"Заказ в WAIT_RETRY_PAY; retry_pay_deadline < текущего времени.";;"1. Открыть деталку заказа.
+   [expected] Блок «Изменить» скрыт или неактивен.
+2. Попытаться открыть bottom sheet смены способа (если UI позволяет).
+   [expected] Кнопка «Готово» неактивна; смена способа невозможна."
+TC-RPMI-008;Сценарий retry_pay (без смены способа) — регрессия;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;High;e2e,retry-pay,regression;"available_function = retry_pay; is_retry_pay = true; дедлайн не истёк.";;"1. Открыть деталку / главную / историю.
+   [expected] Отображается UI «Недостаточно средств, Списать сейчас»; кнопки «Изменить» нет."
+TC-RPMI-009;Смена способа с главной (активный заказ);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;High;e2e,change-pmi,main-screen;"Активный заказ с change_pmi на главной; дедлайн не истёк.";;"1. Нажать «Изменить» на виджете активного заказа.
+   [expected] Открывается деталка + bottom sheet выбора способа оплаты."
+TC-RPMI-010;Смена способа из истории заказов;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;High;e2e,change-pmi,order-history;"Заказ в истории с change_pmi; дедлайн не истёк.";;"1. Нажать «Изменить» в списке истории.
+   [expected] Открывается деталка + bottom sheet."
+TC-RPMI-011;Открытие смены способа по пушу;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;High;e2e,change-pmi,push;Получен пуш об изменении способа оплаты.;;"1. Тапнуть по пушу.
+   [expected] Открывается деталка заказа с bottom sheet выбора способа оплаты."
+TC-RPMI-012;Тогл RETRY_PAY_CHANGE_PMI выключен;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;High;e2e,rubilnik,toggle-off;"Тогл в Rubilnik = OFF; ошибка оплаты (недостаток средств).";;"1. Получить заказ после ошибки оплаты.
+   [expected] available_function ≠ change_pmi или смена недоступна.
+2. Проверить UI.
+   [expected] Отображается «Списать сейчас» / старое поведение без смены способа."
+TC-RPMI-013;Старая версия приложения + change_pmi;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;High;e2e,change-pmi,backward-compatibility;"Установлена старая версия мобильного приложения; бэкенд вернул change_pmi.";;"1. Вызвать POST /retry-pay (старый флоу «Списать сейчас»).
+   [expected] Ответ 424: «Изменить способ оплаты можно только в новой версии приложения»."
+TC-RPMI-014;Пуш при истечении дедлайна без смены (СБП-сценарий);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Normal;e2e,push,deadline,sbp;"Оплата СБП; дедлайн истёк; способ не сменён.";;"1. Дождаться срабатывания джобы отмены партиции.
+   [expected] В ОМС paid = false; payment_status = WITHDRAW_FAILED; пуш: «Не хватает на оплату» / «Пополните счёт, повторим списание через Х минут»."
+TC-RPMI-015;Отложенный пуш ER025 (15 мин);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;E2E;Normal;e2e,push,er025;"Сценарий смены способа; WITHDRAW_FAILED; error_code = ER025.";;"1. Дождаться ~15 мин (или уменьшенный конфиг на стенде).
+   [expected] Отправлен отложенный пуш по тексту [СА] «Нерабочая связка для СБП»."
+TC-RPMI-016;GET /orders/{id}/payment-methods — корректный список для RETRY_PAY;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Critical;backend,ordering,payment-methods;"Заказ WAIT_RETRY_PAY; available_function = change_pmi.";;"1. Вызвать GET /api/ordering/public/v1/orders/{order_id}/payment-methods.
+   [expected] 200; список содержит BANKCARD, SBERPAY, ORANGE_PAY, ADD_CARD, ADD_SBERPAY; нет SBP, ADD_SBP, INSTANT_SBP, PODELI; порядок как в Payments."
+TC-RPMI-017;POST /retry-pay-by-linked-pmi — успешный холд;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Critical;backend,ordering,retry-pay-by-linked-pmi;"Валидный pmi_id; заказ в корректном статусе.";;"1. Вызвать POST /retry-pay-by-linked-pmi.
+   [expected] 200; attempt_count +1; инициирован extrahold/hold; статус переходит корректно."
+TC-RPMI-018;POST /retry-pay-by-unlinked-card — успех;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Critical;backend,ordering,retry-pay-by-unlinked-card;"Валидные данные карты; заказ WAIT_RETRY_PAY.";;"1. Вызвать POST /retry-pay-by-unlinked-card.
+   [expected] 200; создана связка + холд; attempt_count +1."
+TC-RPMI-019;POST /retry-pay-by-unlinked-sberpay — успех;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Critical;backend,ordering,retry-pay-by-unlinked-sberpay;"Валидный SberPay-флоу; заказ WAIT_RETRY_PAY.";;"1. Вызвать POST /retry-pay-by-unlinked-sberpay.
+   [expected] 200; связка SberPay + холд."
+TC-RPMI-020;Обработка /extrahold — HOLD_SUCCESS при смене способа;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Critical;backend,ordering,extrahold;Extrahold в процессе смены PMI.;;"1. Получить callback HOLD_SUCCESS.
+   [expected] Партиция/заказ обновлены; джоба отмены партиции удалена."
+TC-RPMI-021;Обработка /extrahold — HOLD_FAILED при смене способа;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Critical;backend,ordering,extrahold,negative;Extrahold после смены PMI.;;"1. Получить HOLD_FAILED.
+   [expected] available_function остаётся change_pmi; заказ в WAIT_RETRY_PAY; возможна повторная смена."
+TC-RPMI-022;Kafka: маппинг статусов при смене способа оплаты;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Critical;backend,ordering,kafka;Настроен consumer статусов оплаты.;;"1. Отправить HOLD_SUCCESS / HOLD_FAILED / WITHDRAW_FAILED в Kafka.
+   [expected] Статусы payments и заказа соответствуют матрице «Смена способов оплаты»."
+TC-RPMI-023;Поле attempt_count при создании payment;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);High;backend,ordering,attempt-count;Создаётся новый payment.;;"1. Создать payment.
+   [expected] attempt_count = 0."
+TC-RPMI-024;attempt_count инкремент при каждой попытке;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);High;backend,ordering,attempt-count;У payment уже есть попытки оплаты.;;"1. Выполнить retry или смену PMI.
+   [expected] attempt_count увеличивается на 1."
+TC-RPMI-025;available_function в ответах GET order / orders / active;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);High;backend,ordering,api;Payment в WAIT_RETRY_PAY.;;"1. Вызвать GET /orders/{id}, GET /orders, GET /orders/active.
+   [expected] В каждом ответе retry_pay.available_function = change_pmi или retry_pay из payments.available_function."
+TC-RPMI-026;POST /retry-pay при available_function = change_pmi;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);High;backend,ordering,retry-pay,negative;payments.available_function = change_pmi.;;"1. Вызвать POST /retry-pay.
+   [expected] 424 с текстом про новую версию приложения."
+TC-RPMI-027;POST /retry-pay при available_function = retry_pay;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);High;backend,ordering,retry-pay,regression;payments.available_function = retry_pay.;;"1. Вызвать POST /retry-pay.
+   [expected] Стандартное поведение retry (не 424)."
+TC-RPMI-028;Джоба отмены партиции при смене PMI;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);High;backend,ordering,job;Задан orders_parts.retry_pay_deadline.;;"1. Дождаться таймера без успешной оплаты.
+   [expected] Запрос в ОМС /update-payment-status paid=false; пуш об ошибке; payment_status = WITHDRAW_FAILED."
+TC-RPMI-029;Удаление джобы при HOLD_SUCCESS / HOLD_FAILED;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);High;backend,ordering,job;Джоба отмены партиции запланирована.;;"1. Получить HOLD_SUCCESS или HOLD_FAILED.
+   [expected] Джоба удалена; повторная отмена не срабатывает."
+TC-RPMI-030;Кэш способов оплаты в Ordering;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Normal;backend,ordering,cache;Заказ с change_pmi.;;"1. Дважды вызвать GET payment-methods подряд.
+   [expected] Второй запрос отдаётся из кэша; данные консистентны."
+TC-RPMI-031;Негатив: смена PMI после истечения дедлайна;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Normal;backend,ordering,negative,deadline;retry_pay_deadline < now.;;"1. Вызвать retry-pay-by-*.
+   [expected] Ошибка; смена отклонена."
+TC-RPMI-032;Негатив: смена PMI для чужого заказа;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Normal;backend,ordering,negative,security;Авторизован другой cip_id.;;"1. Вызвать retry-pay-by-* для чужого order_id.
+   [expected] 403 или 404."
+TC-RPMI-033;available_function = null;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Ordering);Minor;backend,ordering,edge-case;Payment без значения available_function.;;"1. GET order и POST /retry-pay.
+   [expected] Поведение как retry_pay."
+TC-RPMI-034;Фильтрация target=RETRY_PAY — только ADD_CARD и ADD_SBERPAY в primary;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Payments);Critical;backend,payments,filter;Есть несколько способов оплаты у пользователя.;;"1. GET /api/payments/Internal/v1/payment-methods/{cip_id}?target=RETRY_PAY.
+   [expected] В filter для RETRY_PAY только ADD_CARD, ADD_SBERPAY; остальные отфильтрованы по правилам."
+TC-RPMI-035;Сортировка способов для RETRY_PAY;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Payments);Critical;backend,payments,sort;Несколько способов у пользователя.;;"1. Запросить payment-methods с target=RETRY_PAY.
+   [expected] Порядок соответствует настроенной сортировке RETRY_PAY."
+TC-RPMI-036;/extrahold на статусе HOLD_FAILED;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Payments);Critical;backend,payments,extrahold;Payment в статусе HOLD_FAILED.;;"1. Вызвать extrahold.
+   [expected] Разрешён переход HOLD_FAILED → EXTRA_HOLD_WAITING."
+TC-RPMI-037;/confirm после extrahold без успешного HOLD;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Payments);Critical;backend,payments,confirm;"Только успешный extrahold; HOLD неуспешен.";;"1. Вызвать confirm.
+   [expected] Confirm проходит: сначала ищется успешный HOLD, если нет — успешный extrahold."
+TC-RPMI-038;Регрессия: confirm при успешном HOLD;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Payments);High;backend,payments,confirm,regression;Классический HOLD SUCCESS.;;"1. Вызвать confirm.
+   [expected] Работает по старой логике (приоритет HOLD)."
+TC-RPMI-039;Негатив: extrahold не из HOLD_FAILED;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Payments);Normal;backend,payments,extrahold,negative;Payment в некорректном статусе.;;"1. Вызвать extrahold.
+   [expected] Ошибка валидации."
+TC-RPMI-040;Тогл RETRY_PAY_CHANGE_PMI ON;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Rubilnik);Critical;backend,rubilnik,toggle-on;"Тогл включён; ошибка недостатка средств.";;"1. Создать/получить заказ с retry.
+   [expected] available_function = change_pmi."
+TC-RPMI-041;Тогл RETRY_PAY_CHANGE_PMI OFF;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Backend (Rubilnik);High;backend,rubilnik,toggle-off;"Тогл выключен; ошибка недостатка средств.";;"1. Создать/получить заказ с retry.
+   [expected] available_function = retry_pay или смена недоступна."
+TC-RPMI-042;Деталка: UI при change_pmi;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Critical;frontend,mobile,order-detail;"is_retry_pay=true; дедлайн не истёк; available_function=change_pmi.";;"1. Открыть деталку заказа.
+   [expected] Отображается блок с кнопкой «Изменить» (не «Списать сейчас»)."
+TC-RPMI-043;Bottom sheet: загрузка способов оплаты;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Critical;frontend,mobile,bottom-sheet;Деталка с change_pmi.;;"1. Нажать «Изменить».
+   [expected] Вызван GET /orders/{id}/payment-methods; открыт bottom sheet «Выберите способ оплаты»."
+TC-RPMI-044;Кнопка «Готово» — активность при выборе и дедлайне;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Critical;frontend,mobile,bottom-sheet,deadline;Bottom sheet открыт.;;"1. Не выбирать способ оплаты.
+   [expected] Кнопка «Готово» неактивна.
+2. Выбрать способ при валидном дедлайне.
+   [expected] Кнопка «Готово» активна.
+3. Дождаться истечения дедлайна.
+   [expected] Кнопка «Готово» неактивна."
+TC-RPMI-045;Таймер на bottom sheet;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Critical;frontend,mobile,timer;retry_pay.retry_pay_deadline в ответе деталки.;;"1. Открыть bottom sheet.
+   [expected] Таймер соответствует retry_pay_deadline с бэкенда."
+TC-RPMI-046;Иконки платёжных систем по BIN;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,ui,bankcard;В списке BANKCARD с разными payment_name.;;"1. Открыть bottom sheet.
+   [expected] 2* → MIR; 5* → MC/Maestro; 4* → Visa; иначе — общая иконка."
+TC-RPMI-047;Кнопка «ЕЩЕ» скрыта;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,ui;Bottom sheet открыт.;;"1. Просмотреть список способов.
+   [expected] Кнопки «ЕЩЕ» нет."
+TC-RPMI-048;ADD_SBERPAY скрыт при недоступном диплинке;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,sberpay,negative;SberPay не установлен / схемы не отвечают.;;"1. Открыть bottom sheet.
+   [expected] ADD_SBERPAY не отображается."
+TC-RPMI-049;ADD_SBERPAY виден при отвечающем диплинке;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,sberpay,ios,android;SberPay доступен (iOS/Android).;;"1. Открыть bottom sheet.
+   [expected] ADD_SBERPAY в списке; на iOS — опрос схем по GET /api/payments/v1/deeplink-ios-schemes."
+TC-RPMI-050;Недоступные типы оплаты не показываются;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,payment-types;API не возвращает SBP/PODELI и т.д.;;"1. Открыть bottom sheet.
+   [expected] Нет SBP, ADD_SBP, INSTANT_SBP, PODELI."
+TC-RPMI-051;Порядок способов в списке;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,ui;Несколько способов в ответе API.;;"1. Сравнить UI с JSON.
+   [expected] Порядок = порядку массива payments."
+TC-RPMI-052;Главная: виджет активного заказа change_pmi;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,main-screen;Активный заказ с change_pmi.;;"1. Открыть главную.
+   [expected] UI с «Изменить», не «Списать сейчас»."
+TC-RPMI-053;История: карточка заказа change_pmi;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,order-history;Заказ в списке истории с change_pmi.;;"1. Открыть историю заказов.
+   [expected] Корректный блок и кнопка «Изменить»."
+TC-RPMI-054;Обновление деталки после успешной смены (linked PMI);Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,refresh;Успешный ответ retry-pay-by-linked-pmi.;;"1. Нажать «Готово» и дождаться обновления.
+   [expected] Остаёмся/переходим на деталку; обновление с задержкой ~10 сек."
+TC-RPMI-055;Флоу ADD_CARD: вебвью и возврат;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,add-card;Выбран ADD_CARD.;;"1. Пройти вебвью → закрыть.
+   [expected] После закрытия — деталка с обновлением ~10 сек."
+TC-RPMI-056;Флоу ADD_SBERPAY: диплинк туда-обратно;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);High;frontend,mobile,add-sberpay;Выбран ADD_SBERPAY.;;"1. Уйти в SberPay → вернуться по диплинку.
+   [expected] Деталка с обновлением ~10 сек."
+TC-RPMI-057;is_active=false у способа оплаты;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Normal;frontend,mobile,negative;В ответе есть неактивный способ.;;"1. Открыть bottom sheet.
+   [expected] Неактивный способ недоступен для выбора / визуально отключён."
+TC-RPMI-058;Ошибка API payment-methods;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Normal;frontend,mobile,error-handling;Мок/стенд возвращает 5xx или timeout.;;"1. Нажать «Изменить».
+   [expected] Понятная ошибка; повтор возможен; приложение не падает."
+TC-RPMI-059;Ошибка retry-pay-by-*;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Normal;frontend,mobile,error-handling;API возвращает ошибку.;;"1. Нажать «Готово».
+   [expected] Ошибка пользователю; bottom sheet/деталка в консистентном состоянии."
+TC-RPMI-060;UI при истёкшем дедлайне на деталке;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Minor;frontend,mobile,deadline;retry_pay_deadline < now.;;"1. Открыть деталку.
+   [expected] Нет активного сценария смены/retry."
+TC-RPMI-061;Bottom sheet аналогичен чекауту;Оплата;Смена способа оплаты при недостатке средств;БТ-1536;Frontend (Mobile);Minor;frontend,mobile,ui,regression;Есть эталонный чекаут.;;"1. Сравнить UI bottom sheet с чекаутом.
+   [expected] Стили и состояния выбора как на чекауте; кнопки «ЕЩЕ» нет."
