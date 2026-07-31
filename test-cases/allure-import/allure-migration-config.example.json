@@ -1,0 +1,35 @@
+{
+  "$schema": "https://qameta.github.io/docs-3p-migration-script/",
+  "_comment": "Пример конфигурации. Скопируйте в config.json и заполните значения под ваш инстанс Allure TestOps.",
+  "source": {
+    "type": "csv",
+    "path": "./retry-pay-change-pmi-allure-steps.csv",
+    "delimiter": ";",
+    "encoding": "UTF-8"
+  },
+  "target": {
+    "endpoint": "https://your-allure-instance.example.com",
+    "token": "YOUR_API_TOKEN",
+    "projectId": 1
+  },
+  "fieldMapping": {
+    "name": "name",
+    "precondition": "precondition",
+    "step_action": "scenario.step.action",
+    "step_expected_result": "scenario.step.expectedResult",
+    "Epic": "epic",
+    "Feature": "feature",
+    "Story": "story",
+    "Severity": "severity",
+    "tag": "tag",
+    "Layer": "customField.layer",
+    "external_id": "customField.externalId",
+    "description": "description"
+  },
+  "groupBy": "external_id",
+  "options": {
+    "createMissingCustomFields": true,
+    "defaultWorkflow": "Manual",
+    "skipAllureId": true
+  }
+}
