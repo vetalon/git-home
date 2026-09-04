@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "allure-testops-mcp": {
+      "url": "${env:ALLURE_MCP_ENDPOINT}",
+      "headers": {
+        "Authorization": "api-token ${env:ALLURE_TOKEN}"
+      }
+    }
+  }
+}
