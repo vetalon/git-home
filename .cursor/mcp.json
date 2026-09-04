@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "allure-testops-mcp": {
-      "url": "${env:ALLURE_MCP_ENDPOINT}",
+      "url": "https://allure.x5.ru/api/mcp",
       "headers": {
         "Authorization": "api-token ${env:ALLURE_TOKEN}"
       }
